@@ -30,6 +30,9 @@ import argparse
 import os
 import random
 slim = tf.contrib.slim
+import logging
+logging.getLogger('tensorflow').disabled = True
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_memory_fraction', type=float, default=0.95)
@@ -107,6 +110,9 @@ def rand_crop():
 ret1 = s_net.inference_stable_net(False)
 ret2 = s_net.inference_stable_net(True)
 
+####################################
+#     CARICAMENTO MODELLO NN       #
+####################################
 with tf.name_scope('data_flow'):
     flow = tf.placeholder(tf.float32, [None, height, width, 2])
     x_flow = tf.slice(flow, [0, 0, 0, 0], [-1, -1, -1, 1])
@@ -158,8 +164,13 @@ learning_rate = tf.train.exponential_decay(initial_learning_rate,
                                            decay_steps=step_size,decay_rate=0.1, staircase=True)
 opt = tf.train.AdamOptimizer(learning_rate)
 optimizer = opt.minimize(total_loss, global_step=global_step)
+#################################
+# FINE CARICAMENTO MODELLO      #
+#################################
 
-
+######################################
+#   CARICAMENTO DATI TRAIN/TEST      #
+######################################
 with tf.name_scope('datas'):
     data_x1, data_y1, data_x2, data_y2, data_flow, \
         data_feature_matches1, data_mask1, data_feature_matches2, data_mask2 = get_data_flow.read_and_decode(

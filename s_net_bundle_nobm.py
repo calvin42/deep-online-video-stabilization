@@ -70,7 +70,7 @@ def get_4_pts(theta, batch_size):
 
     return pts1, pts2
 
-def get_theta_black_loss(theta, do_crop_rate):
+def get_theta_black_loss(theta, do_crop_rate): #NOT USED
     theta = tf.reshape(theta, (-1, 3, 3))
     theta = tf.cast(theta, 'float32')
 
@@ -112,7 +112,7 @@ def get_theta_black_loss(theta, do_crop_rate):
     black_err = tf.where(tf.greater(output, one_), output - one_, zero_) + tf.where(tf.greater(one_ * -1, output), one_ * -1 - output, zero_)
     return tf.reduce_mean(tf.abs(output - target)), tf.reshape(black_err, [batch_size, -1])
 
-def reduce_layer(input):
+def reduce_layer(input): #NOT USED
     with tf.variable_scope('reduce_layer'):
         with tf.variable_scope('conv0'):
             conv0_ = conv_bn_relu_layer(input, [1, 1, 2048, 512], 1)
@@ -209,7 +209,7 @@ def get_consistency_loss(pts):
             loss = tf.reduce_mean(loss * loss)
     return loss
 
-def to_mat(x):
+def to_mat(x): #NOT USED
     return tf.reshape(x, [-1, 3, 3])
 
 def warp_pts(pts, flow):
@@ -229,7 +229,7 @@ def warp_pts(pts, flow):
         out.append(tf.reshape(temp, [1, max_matches, 2]))
     return tf.concat(out, 0)
 
-def get_resnet_(x_tensor, reuse, is_training, x_batch_size):
+def get_resnet_(x_tensor, reuse, is_training, x_batch_size): #NOT USED
     with tf.variable_scope('resnet', reuse=reuse):
         with slim.arg_scope(resnet_v2.resnet_arg_scope()):
             resnet, end_points = resnet_v2.resnet_v2_50(x_tensor, global_pool=False, is_training=is_training, reuse=reuse, output_stride=32)
@@ -250,13 +250,15 @@ def get_resnet_(x_tensor, reuse, is_training, x_batch_size):
 def get_resnet(x_tensor, reuse, is_training, x_batch_size):
     with tf.variable_scope('resnet', reuse=reuse):
         with slim.arg_scope(resnet_v2.resnet_arg_scope()):
+            # HERE IT CREATES THE RESNET-50 WHICH IS THE ENCODER
             resnet, end_points = resnet_v2.resnet_v2_50(x_tensor, global_pool=False, is_training=is_training, reuse=reuse, output_stride=32)
         global_pool = tf.reduce_mean(resnet, [1, 2])
+        # AND HERE IT CREATES THE MULTIGRID REGRESSOR
         with tf.variable_scope('fc'):
             global_pool = slim.fully_connected(global_pool, 2048, scope='fc/fc_1')
             global_pool = slim.fully_connected(global_pool, 1024, scope='fc/fc_2')
             global_pool = slim.fully_connected(global_pool, 512, scope='fc/fc_3')
-            theta = output_layer(global_pool, (grid_h + 1) * (grid_w + 1) * 2)
+            theta = output_layer(global_pool, (grid_h + 1) * (grid_w + 1) * 2) #fc_reg
 
 
         with tf.name_scope('gen_theta'):
@@ -331,7 +333,7 @@ def inference_stable_net(reuse):
 
         h_trans, black_pix, flow = transformer(x, pts2)
 
-
+        # feature loss
         with tf.name_scope('feature_loss'):
             use_feature_loss = tf.placeholder(tf.float32)
             stable_pts = matches[:, :, :2]

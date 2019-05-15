@@ -137,6 +137,7 @@ def warpRevBundle2(img, x_map, y_map):
     assert(img.ndim == 3)
     assert(img.shape[-1] == 3)
     rate = 4
+    # rate = 1
     x_map = cv2.resize(cv2.resize(x_map, (int(width / rate), int(height / rate))), (width, height))
     y_map = cv2.resize(cv2.resize(y_map, (int(width / rate), int(height / rate))), (width, height))
     x_map = (x_map + 1) / 2 * width
@@ -209,7 +210,8 @@ for video_name in video_list:
     ret, stable_cap_frame = stable_cap.read()
     ret, unstable_cap_frame = unstable_cap.read()
     if (args.start_with_stable):
-        frame = stable_cap_frame
+        # frame = stable_cap_frame
+        print("start_with_stable")
     else:
         frame = unstable_cap_frame
     videoWriter.write(cv2.resize(frame, (width, height)))

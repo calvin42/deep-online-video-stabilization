@@ -1,7 +1,7 @@
 # imgloss + tmploss + featureloss
 import numpy as np
-height = 288
-width = 512
+height = 720
+width = 1280
 batch_size = 10
 initial_learning_rate = 2e-5
 feature_mul = 1#10 * width

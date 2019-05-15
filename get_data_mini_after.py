@@ -159,8 +159,9 @@ def read_and_decode(filepath, num_epochs, shuffle=True):
     file_obj = open(filepath + 'list.txt')
     file_txt = file_obj.read()
     file_list = []
-    for f in file_txt.split(' '):
+    for f in file_txt.split('\n'):
         file_list.append(filepath + f.strip())
+
     filename_queue = tf.train.string_input_producer(file_list, num_epochs=None, shuffle=shuffle)
 
     reader = tf.TFRecordReader()
